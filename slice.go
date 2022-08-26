@@ -81,3 +81,10 @@ func (s *Slice[T]) IndexFunc(f func(T) bool) int {
 
 	return -1
 }
+
+func (s *Slice[T]) Len() int {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	return len(s.Data)
+}
