@@ -24,6 +24,20 @@ func (s *Slice[T]) Insert(index uint, v T) {
 	s.Data[index] = v
 }
 
+func (s *Slice[T]) SafeInsert(index int, v T) bool {
+	s.lock.RLock()
+	if index >= len(s.Data) {
+		return false
+	}
+	s.lock.RUnlock()
+
+	s.lock.Lock()
+	s.Data[index] = v
+	s.lock.Unlock()
+
+	return true
+}
+
 func (s *Slice[T]) Get(index int) T {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -50,23 +64,29 @@ func (s *Slice[T]) SafeGet(index int) (T, bool) {
 }
 
 // Delete deletes the item at index i. Delete will panic if i is out of bounds. If a panic is undesired, use SafeDelete.
-func (s *Slice[T]) Delete(i int) {
+func (s *Slice[T]) Delete(index int) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	s.Data = append(s.Data[:i], s.Data[i+1:]...)
+	s.Data = append(s.Data[:index], s.Data[index+1:]...)
 }
 
-func (s *Slice[T]) SafeDelete(i int) bool {
-	if i < 0 || i >= len(s.Data) {
+func (s *Slice[T]) SafeDelete(index int) bool {
+	if index < 0 || index >= len(s.Data) {
 		return false
 	}
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	s.Data = append(s.Data[:i], s.Data[i+1:]...)
+	s.Data = append(s.Data[:index], s.Data[index+1:]...)
 	return true
+}
+
+func (s *Slice[T]) Empty() {
+	s.lock.Lock()
+	s.Data = nil
+	s.lock.Unlock()
 }
 
 func (s *Slice[T]) IndexFunc(f func(T) bool) int {
