@@ -84,3 +84,11 @@ func (m *Map[K, V]) Items() ([]K, []V) {
 
 	return keys, values
 }
+
+func (m *Map[K, V]) Empty() {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	m.Data = nil
+	m.Data = make(map[K]V)
+}
