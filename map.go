@@ -92,3 +92,10 @@ func (m *Map[K, V]) Empty() {
 	m.Data = nil
 	m.Data = make(map[K]V)
 }
+
+func (m *Map[K, V]) Len() int {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
+	return len(m.Data)
+}
