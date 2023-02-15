@@ -17,7 +17,7 @@ func (s *Slice[T]) Append(v T) {
 	s.Data = append(s.Data, v)
 }
 
-func (s *Slice[T]) Insert(index uint, v T) {
+func (s *Slice[T]) Insert(index int, v T) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
