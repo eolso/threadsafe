@@ -6,7 +6,7 @@ import (
 
 type Slice[T any] struct {
 	Data []T
-	lock sync.RWMutex
+	lock sync.Mutex
 }
 
 // Append appends the value v into Slice.
@@ -25,36 +25,35 @@ func (s *Slice[T]) Insert(index int, v T) {
 }
 
 func (s *Slice[T]) SafeInsert(index int, v T) bool {
-	s.lock.RLock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	if index >= len(s.Data) {
 		return false
 	}
-	s.lock.RUnlock()
 
-	s.lock.Lock()
 	s.Data[index] = v
-	s.lock.Unlock()
 
 	return true
 }
 
 func (s *Slice[T]) Get(index int) T {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	return s.Data[index]
 }
 
 func (s *Slice[T]) GetAll() []T {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	return s.Data
 }
 
 func (s *Slice[T]) SafeGet(index int) (T, bool) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	if index > len(s.Data) {
 		return *new(T), false
@@ -90,8 +89,8 @@ func (s *Slice[T]) Empty() {
 }
 
 func (s *Slice[T]) IndexFunc(f func(T) bool) int {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	for i, v := range s.Data {
 		if f(v) {
@@ -103,8 +102,8 @@ func (s *Slice[T]) IndexFunc(f func(T) bool) int {
 }
 
 func (s *Slice[T]) Len() int {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	return len(s.Data)
 }
