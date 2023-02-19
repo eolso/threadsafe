@@ -55,7 +55,7 @@ func (s *Slice[T]) SafeGet(index int) (T, bool) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	if index > len(s.Data) {
+	if index >= len(s.Data) {
 		return *new(T), false
 	}
 
