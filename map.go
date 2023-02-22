@@ -4,7 +4,7 @@ import "sync"
 
 type Map[K comparable, V any] struct {
 	Data map[K]V
-	lock sync.RWMutex
+	lock sync.Mutex
 }
 
 func NewMap[K comparable, V any]() *Map[K, V] {
@@ -14,8 +14,8 @@ func NewMap[K comparable, V any]() *Map[K, V] {
 }
 
 func (m *Map[K, V]) Get(key K) (V, bool) {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	v, ok := m.Data[key]
 
@@ -39,8 +39,8 @@ func (m *Map[K, V]) Delete(key K) {
 }
 
 func (m *Map[K, V]) Keys() []K {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	keys := make([]K, len(m.Data))
 
@@ -54,8 +54,8 @@ func (m *Map[K, V]) Keys() []K {
 }
 
 func (m *Map[K, V]) Values() []V {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	values := make([]V, len(m.Data))
 
@@ -69,8 +69,8 @@ func (m *Map[K, V]) Values() []V {
 }
 
 func (m *Map[K, V]) Items() ([]K, []V) {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	keys := make([]K, len(m.Data))
 	values := make([]V, len(m.Data))
@@ -94,8 +94,8 @@ func (m *Map[K, V]) Empty() {
 }
 
 func (m *Map[K, V]) Len() int {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	return len(m.Data)
 }
