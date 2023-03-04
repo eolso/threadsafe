@@ -21,10 +21,30 @@ func (s *Slice[T]) Insert(index int, v T) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	s.Data[index] = v
+	s.Data = append(s.Data[:index], append([]T{v}, s.Data[index:]...)...)
 }
 
 func (s *Slice[T]) SafeInsert(index int, v T) bool {
+	if index < 0 || index > len(s.Data) {
+		return false
+	}
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.Data = append(s.Data[:index], append([]T{v}, s.Data[index:]...)...)
+
+	return true
+}
+
+func (s *Slice[T]) Replace(index int, v T) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.Data[index] = v
+}
+
+func (s *Slice[T]) SafeReplace(index int, v T) bool {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
