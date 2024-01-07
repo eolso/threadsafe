@@ -48,7 +48,7 @@ func (s *Slice[T]) SafeReplace(index int, v T) bool {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	if index >= len(s.Data) {
+	if index < 0 || index >= len(s.Data) {
 		return false
 	}
 
@@ -75,7 +75,7 @@ func (s *Slice[T]) SafeGet(index int) (T, bool) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	if index >= len(s.Data) {
+	if index < 0 || index >= len(s.Data) {
 		return *new(T), false
 	}
 
