@@ -22,6 +22,22 @@ func (m *Map[K, V]) Get(key K) (V, bool) {
 	return v, ok
 }
 
+// Pull behaves like Get but will also delete the key from the map before returning and unlocking the map. This can be
+// useful for singleton operations.
+func (m *Map[K, V]) Pull(key K) (V, bool) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	v, ok := m.Data[key]
+	if !ok {
+		return v, ok
+	}
+
+	m.Delete(key)
+
+	return v, ok
+}
+
 func (m *Map[K, V]) Set(key K, value V) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
