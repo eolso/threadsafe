@@ -2,6 +2,8 @@ package threadsafe
 
 import "sync"
 
+// Map represents a generic map[comparable]any that locks itself on each operation. The underlying map Data is left
+// exposed to not block any potential operations that might be needed, but should generally not be touched directly.
 type Map[K comparable, V any] struct {
 	Data map[K]V
 	lock sync.Mutex
@@ -13,6 +15,7 @@ func NewMap[K comparable, V any]() *Map[K, V] {
 	}
 }
 
+// Get returns the value V at key K. Also returns a boolean representing if the value was found or not.
 func (m *Map[K, V]) Get(key K) (V, bool) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -38,6 +41,7 @@ func (m *Map[K, V]) Pull(key K) (V, bool) {
 	return v, ok
 }
 
+// Set writes the value V at key K.
 func (m *Map[K, V]) Set(key K, value V) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -45,6 +49,7 @@ func (m *Map[K, V]) Set(key K, value V) {
 	m.Data[key] = value
 }
 
+// Delete deletes the key K, if it exists.
 func (m *Map[K, V]) Delete(key K) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -54,6 +59,7 @@ func (m *Map[K, V]) Delete(key K) {
 	}
 }
 
+// Keys returns a slice of K keys.
 func (m *Map[K, V]) Keys() []K {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -69,6 +75,7 @@ func (m *Map[K, V]) Keys() []K {
 	return keys
 }
 
+// Values returns a slice V values.
 func (m *Map[K, V]) Values() []V {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -84,6 +91,7 @@ func (m *Map[K, V]) Values() []V {
 	return values
 }
 
+// Items returns both the slice of keys and values.
 func (m *Map[K, V]) Items() ([]K, []V) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -101,6 +109,7 @@ func (m *Map[K, V]) Items() ([]K, []V) {
 	return keys, values
 }
 
+// Empty deletes all keys in the map.
 func (m *Map[K, V]) Empty() {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -109,6 +118,7 @@ func (m *Map[K, V]) Empty() {
 	m.Data = make(map[K]V)
 }
 
+// Len returns the length of the map.
 func (m *Map[K, V]) Len() int {
 	m.lock.Lock()
 	defer m.lock.Unlock()
